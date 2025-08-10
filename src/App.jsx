@@ -9,6 +9,7 @@ function App() {
 
   const [todo, setTodo] = useState("")
   const [todos, setTodos] = useState([])
+  const [showFinished, setshowFinished] = useState(true)
 
   useEffect(() => {
     let todoString = localStorage.getItem("todos")
@@ -21,6 +22,11 @@ function App() {
   const saveToLS = (items) => {
     localStorage.setItem("todos", JSON.stringify(items))
   }
+
+  const toggleFinished = () => {
+    setshowFinished(!showFinished)
+  }
+
 
   const handleEdit = (e, id) => {
     ///first display it for edit
@@ -50,10 +56,12 @@ function App() {
   }
 
   const handleAdd = () => {
-    const newTodos = [...todos, { id: uuidv4(), todo, isCompleted: false }]
-    setTodos(newTodos)
-    setTodo("")
-    saveToLS(newTodos)
+    if (todo.trim() !== "") {
+      const newTodos = [...todos, { id: uuidv4(), todo, isCompleted: false }]
+      setTodos(newTodos)
+      setTodo("")
+      saveToLS(newTodos)
+    }
   }
 
   const handleChange = (e) => {
@@ -91,17 +99,18 @@ function App() {
           <button onClick={handleAdd} className="bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-6 ">Save</button>
         </div>
 
+        <input onChange = {toggleFinished} type="checkbox" checked = {showFinished}/>Show Finished
         <h2 className='text-xl font-bold'>Your Todos</h2>
 
-        <div className="todos">
+        <div className="todos"> 
 
           {todos.length === 0 && <div className='m-5'>No todos to display </div>}
 
           {todos.map(item => {
 
-            return (<div key={item.id} className="todo flex w-1/4 justify-between my-3">
+            return (showFinished||!item.isCompleted) && (<div key={item.id} className="todo flex w-1/4 justify-between my-3">
               <div className='flex gap-5'>
-                <input name={item.id} onChange={handleCheckbox} type="checkbox" value={item.isCompleted} />
+                <input name={item.id} onChange={handleCheckbox} type="checkbox" checked={item.isCompleted} />
                 <div className={item.isCompleted ? "line-through" : ""}>{item.todo}</div>
               </div>
               <div className="buttons flex h-full">
